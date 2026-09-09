@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -1597,17 +1598,24 @@ namespace SourceGit.ViewModels
             if (services.Count == 1)
                 return [services[0]];
 
-            var preferred = _settings.PreferredOpenAIService;
-            var all = new List<AI.Service>();
+            var byName = new Dictionary<string, AI.Service>();
             foreach (var service in services)
             {
-                if (service.Name.Equals(preferred, StringComparison.Ordinal))
-                    return [service];
-
-                all.Add(service);
+                if (!string.IsNullOrEmpty(service.Name) && !byName.ContainsKey(service.Name))
+                    byName.Add(service.Name, service);
             }
 
-            return all;
+            // Resolution order: per-repository preference first, then the global default;
+            // both missing -> return all (the picker menu shows up).
+            var preferred = _settings.PreferredOpenAIService;
+            if (!string.IsNullOrEmpty(preferred) && byName.TryGetValue(preferred, out var repoPreferred))
+                return [repoPreferred];
+
+            var globalDefault = Preferences.Instance.DefaultOpenAIService;
+            if (!string.IsNullOrEmpty(globalDefault) && byName.TryGetValue(globalDefault, out var def))
+                return [def];
+
+            return services.ToList();
         }
 
         public async Task<bool> SaveCommitAsPatchAsync(Models.Commit commit, string folder, int index = 0)

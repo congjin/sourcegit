@@ -824,13 +824,25 @@
             <TextBlock Classes="tab_header" Text="{DynamicResource Text.Preferences.AI}"/>
           </TabItem.Header>
 
-          <Grid Margin="0,8,0,16" MinHeight="400">
+          <Grid Margin="0,8,0,16" MinHeight="400" RowDefinitions="Auto,*">
             <Grid.ColumnDefinitions>
               <ColumnDefinition Width="200"/>
               <ColumnDefinition Width="*" MaxWidth="400"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0"
+            <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                        Orientation="Horizontal" Margin="0,0,0,8">
+              <TextBlock Text="{DynamicResource Text.Preferences.AI.DefaultService}" VerticalAlignment="Center"/>
+              <ComboBox Width="220" Height="28" Margin="8,0,0,0" VerticalAlignment="Center"
+                        ItemsSource="{Binding OpenAIServiceNames}"
+                        SelectedItem="{Binding DefaultOpenAIService, Mode=TwoWay}"/>
+              <Border Width="28" Height="28" Background="Transparent" VerticalAlignment="Center"
+                      ToolTip.Tip="{DynamicResource Text.Preferences.AI.DefaultService.Tip}">
+                <Path Width="14" Height="14" Data="{StaticResource Icons.Info}" Fill="{DynamicResource Brush.FG1}" Opacity="0.8"/>
+              </Border>
+            </StackPanel>
+
+            <Border Grid.Row="1" Grid.Column="0"
                     BorderThickness="1" BorderBrush="{DynamicResource Brush.Border2}"
                     Background="{DynamicResource Brush.Contents}">
               <Grid RowDefinitions="*,1,Auto">
@@ -877,7 +889,7 @@
               </Grid>
             </Border>
 
-            <ContentControl Grid.Column="1" Margin="16,0,0,0">
+            <ContentControl Grid.Row="1" Grid.Column="1" Margin="16,0,0,0">
               <ContentControl.Content>
                 <Binding Path="#ThisControl.SelectedOpenAIService">
                   <Binding.TargetNullValue>
@@ -907,11 +919,12 @@
                               IsChecked="{Binding ReadApiKeyFromEnv, Mode=TwoWay}"/>
 
                     <TextBlock Margin="0,8,0,0" Text="{DynamicResource Text.Preferences.AI.Model}"/>
-                    <TextBox Margin="0,4,0,0"
-                             CornerRadius="3"
-                             Height="28"
-                             Text="{Binding Model, Mode=TwoWay}"
-                             IsEnabled="{Binding !AutoFetchAvailableModels, Mode=OneWay}"/>
+                    <v:FilterableComboBox Margin="0,4,0,0"
+                                          Height="28"
+                                          HorizontalAlignment="Stretch"
+                                          PlaceholderText="{DynamicResource Text.FilterableComboBox.FilterHint}"
+                                          ItemsSource="{Binding AvailableModels, Mode=OneWay}"
+                                          SelectedModel="{Binding Model, Mode=TwoWay}"/>
                     <CheckBox Margin="0,4,0,0"
                               Height="28"
                               Content="{DynamicResource Text.Preferences.AI.Model.AutoFetchAvailableModels}"

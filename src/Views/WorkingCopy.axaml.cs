@@ -1403,13 +1403,23 @@ namespace SourceGit.Views
             menu.Items.Add(new MenuItem() { Header = "-" });
         }
 
-        private void DoOpenAIAssistant(ViewModels.Repository repo, AI.Service serivce, List<Models.Change> changes)
+        private void DoOpenAIAssistant(ViewModels.Repository repo, AI.Service service, List<Models.Change> changes)
         {
             var owner = TopLevel.GetTopLevel(this) as Window;
             if (owner == null)
                 return;
 
-            var assistant = new ViewModels.AIAssistant(repo, serivce, changes);
+            // Remember the service for this repository so the picker menu won't show up
+            // again. Skipped when a global default platform exists, which always wins;
+            // otherwise the per-repository memory would pin a stale service.
+            if (!ViewModels.Preferences.Instance.HasDefaultOpenAIService &&
+                repo.Settings.PreferredOpenAIService.Equals("---", StringComparison.Ordinal))
+            {
+                repo.Settings.PreferredOpenAIService = service.Name;
+                repo.Settings.Save();
+            }
+
+            var assistant = new ViewModels.AIAssistant(repo, service, changes);
             var view = new AIAssistant() { DataContext = assistant };
             view.Show(owner);
         }

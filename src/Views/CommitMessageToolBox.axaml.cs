@@ -706,6 +706,16 @@ namespace SourceGit.Views
             if (owner == null)
                 return;
 
+            // Remember the service for this repository so the picker menu won't show up
+            // again. Skipped when a global default platform exists, which always wins;
+            // otherwise the per-repository memory would pin a stale service.
+            if (!ViewModels.Preferences.Instance.HasDefaultOpenAIService &&
+                repo.Settings.PreferredOpenAIService.Equals("---", StringComparison.Ordinal))
+            {
+                repo.Settings.PreferredOpenAIService = service.Name;
+                repo.Settings.Save();
+            }
+
             var assistant = new ViewModels.AIAssistant(repo, service, changes);
             var view = new AIAssistant() { DataContext = assistant };
             view.Show(owner);

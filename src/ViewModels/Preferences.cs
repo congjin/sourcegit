@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -22,6 +24,7 @@ namespace SourceGit.ViewModels
                 _instance = Load();
                 _instance._isLoading = false;
 
+                _instance.HookOpenAIServiceChanges();
                 _instance.PrepareGit();
                 _instance.PrepareShellOrTerminal();
                 _instance.PrepareExternalDiffMergeTool();
@@ -486,6 +489,89 @@ namespace SourceGit.ViewModels
             set;
         } = [];
 
+        [JsonIgnore]
+        public AvaloniaList<string> OpenAIServiceNames
+        {
+            get;
+        } = ["---"];
+
+        public string DefaultOpenAIService
+        {
+            get => _defaultOpenAIService;
+            set
+            {
+                // Null may be pushed back transiently when the list is rebuilt; ignore it
+                // so the saved default is not erased.
+                if (value == null)
+                    return;
+
+                if (SetProperty(ref _defaultOpenAIService, value))
+                    OnPropertyChanged(nameof(HasDefaultOpenAIService));
+            }
+        }
+
+        [JsonIgnore]
+        public bool HasDefaultOpenAIService
+        {
+            get => !string.IsNullOrEmpty(_defaultOpenAIService) && !_defaultOpenAIService.Equals("---", StringComparison.Ordinal);
+        }
+
+        private void HookOpenAIServiceChanges()
+        {
+            if (OpenAIServices is INotifyCollectionChanged incc)
+            {
+                incc.CollectionChanged += (_, _) => RefreshOpenAIServiceNames();
+            }
+
+            foreach (var service in OpenAIServices)
+                HookServiceNameChange(service);
+
+            RefreshOpenAIServiceNames();
+        }
+
+        private void HookServiceNameChange(AI.Service service)
+        {
+            service.PropertyChanged += (_, ev) =>
+            {
+                if (ev.PropertyName == nameof(AI.Service.Name))
+                    RefreshOpenAIServiceNames();
+            };
+        }
+
+        private void RefreshOpenAIServiceNames()
+        {
+            var names = new List<string>() { "---" };
+            foreach (var service in OpenAIServices)
+            {
+                if (!string.IsNullOrEmpty(service.Name) && !names.Contains(service.Name))
+                    names.Add(service.Name);
+            }
+
+            OpenAIServiceNames.Clear();
+            foreach (var name in names)
+                OpenAIServiceNames.Add(name);
+
+            ValidateDefaultOpenAIService();
+
+            // Re-assert the current default so the UI keeps it selected after the list changed.
+            OnPropertyChanged(nameof(DefaultOpenAIService));
+        }
+
+        // Falls back to per-repository preference when the default service is renamed or removed.
+        private void ValidateDefaultOpenAIService()
+        {
+            if (!HasDefaultOpenAIService)
+                return;
+
+            foreach (var name in OpenAIServiceNames)
+            {
+                if (name.Equals(DefaultOpenAIService, StringComparison.Ordinal))
+                    return;
+            }
+
+            DefaultOpenAIService = "---";
+        }
+
         public double LastCheckUpdateTime
         {
             get => _lastCheckUpdateTime;
@@ -868,5 +954,6 @@ namespace SourceGit.ViewModels
 
         private string _gitDefaultCloneDir = string.Empty;
         private int _shellOrTerminalType = -1;
+        private string _defaultOpenAIService = "---";
     }
 }

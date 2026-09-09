@@ -18,7 +18,13 @@ namespace SourceGit.ViewModels
         public string CurrentModel
         {
             get => _service.Model;
-            set => _service.Model = value;
+            set
+            {
+                // Selection gets cleared (null) while the user is typing to filter
+                // models; such intermediate states must not erase the saved model.
+                if (value != null)
+                    _service.Model = value;
+            }
         }
 
         public bool IsGenerating
@@ -44,6 +50,10 @@ namespace SourceGit.ViewModels
             _repo = repo;
             _service = service;
             _cancel = new CancellationTokenSource();
+
+            // The model list is fetched asynchronously at startup; re-notify bindings
+            // once it arrives so the dropdown picks it up.
+            _service.PropertyChanged += OnServicePropertyChanged;
 
             var builder = new StringBuilder();
             foreach (var c in changes)
@@ -122,6 +132,22 @@ namespace SourceGit.ViewModels
         public void Cancel()
         {
             _cancel?.Cancel();
+        }
+
+        // Detaches the service subscription so the window-scoped VM can be collected.
+        public void Release()
+        {
+            _service.PropertyChanged -= OnServicePropertyChanged;
+        }
+
+        private void OnServicePropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            // Forward the async model-list arrival and the fallback model pick so the
+            // bound combo stays in sync with what the service will actually use.
+            if (e.PropertyName == nameof(AI.Service.AvailableModels))
+                OnPropertyChanged(nameof(AvailableModels));
+            else if (e.PropertyName == nameof(AI.Service.Model))
+                OnPropertyChanged(nameof(CurrentModel));
         }
 
         private void SerializeChange(Models.Change c, StringBuilder builder)

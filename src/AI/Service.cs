@@ -4,6 +4,8 @@ using System.ClientModel.Primitives;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
+using Avalonia.Threading;
+
 using Azure.AI.OpenAI;
 using CommunityToolkit.Mvvm.ComponentModel;
 using OpenAI;
@@ -47,7 +49,13 @@ namespace SourceGit.AI
         public string Model
         {
             get => _model;
-            set => SetProperty(ref _model, value);
+            set
+            {
+                // The value may transiently become null while the user is typing to
+                // filter models in the selector; such states must not erase the model.
+                if (value != null)
+                    SetProperty(ref _model, value);
+            }
         }
 
         public bool AutoFetchAvailableModels
@@ -79,17 +87,38 @@ namespace SourceGit.AI
             if (!_autoFetchAvailableModels)
             {
                 if (!string.IsNullOrEmpty(Model))
+                {
                     AvailableModels = [Model];
+                    NotifyAvailableModelsChanged();
+                }
+
                 return;
             }
 
             var allModels = GetOpenAIClient().GetOpenAIModelClient().GetModels();
-            AvailableModels = new List<string>();
+            var models = new List<string>();
             foreach (var model in allModels.Value)
-                AvailableModels.Add(model.Id);
+                models.Add(model.Id);
 
-            if (AvailableModels.Count > 0 && (string.IsNullOrEmpty(Model) || !AvailableModels.Contains(Model)))
-                Model = AvailableModels[0];
+            // Respect the model explicitly set by the user (the default one or the last
+            // used); only pick the first available when nothing has been chosen yet.
+            var fallback = models.Count > 0 && string.IsNullOrEmpty(Model) ? models[0] : null;
+            AvailableModels = models;
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                // The user may have picked a model while the fetch was in flight;
+                // only fill in the fallback when nothing has been chosen yet.
+                if (fallback != null && string.IsNullOrEmpty(Model))
+                    Model = fallback;
+
+                OnPropertyChanged(nameof(AvailableModels));
+            });
+        }
+
+        private void NotifyAvailableModelsChanged()
+        {
+            Dispatcher.UIThread.Post(() => OnPropertyChanged(nameof(AvailableModels)));
         }
 
         public ChatClient GetChatClient()

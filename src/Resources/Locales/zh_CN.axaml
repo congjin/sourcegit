@@ -26,6 +26,7 @@
   <x:String x:Key="Text.AIAssistant.Regen" xml:space="preserve">重新生成</x:String>
   <x:String x:Key="Text.AIAssistant.Tip" xml:space="preserve">使用AI助手生成提交信息</x:String>
   <x:String x:Key="Text.AIAssistant.Use" xml:space="preserve">应用</x:String>
+  <x:String x:Key="Text.FilterableComboBox.FilterHint" xml:space="preserve">输入关键字筛选…</x:String>
   <x:String x:Key="Text.App.Hide" xml:space="preserve">隐藏 SourceGit</x:String>
   <x:String x:Key="Text.App.HideOthers" xml:space="preserve">隐藏其他</x:String>
   <x:String x:Key="Text.App.ShowAll" xml:space="preserve">显示全部</x:String>
@@ -666,6 +667,8 @@
   <x:String x:Key="Text.Preferences.AI" xml:space="preserve">AI</x:String>
   <x:String x:Key="Text.Preferences.AI.AdditionalPrompt" xml:space="preserve">附加提示词 (请使用 `-` 列出您的要求)</x:String>
   <x:String x:Key="Text.Preferences.AI.ApiKey" xml:space="preserve">API密钥</x:String>
+  <x:String x:Key="Text.Preferences.AI.DefaultService" xml:space="preserve">默认平台</x:String>
+  <x:String x:Key="Text.Preferences.AI.DefaultService.Tip" xml:space="preserve">所有仓库生成提交信息时默认使用该平台；仓库级设置可覆盖。未指定时，各仓库将记住并使用上一次所选的平台。</x:String>
   <x:String x:Key="Text.Preferences.AI.ExtraHeaders" xml:space="preserve">附加 HTTP 请求头部 (格式：每行一条 Name: Value)</x:String>
   <x:String x:Key="Text.Preferences.AI.Model" xml:space="preserve">模型</x:String>
   <x:String x:Key="Text.Preferences.AI.Model.AutoFetchAvailableModels" xml:space="preserve">自动拉取可用模型列表</x:String>

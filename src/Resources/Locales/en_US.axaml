@@ -22,6 +22,7 @@
   <x:String x:Key="Text.AIAssistant.Regen" xml:space="preserve">RE-GENERATE</x:String>
   <x:String x:Key="Text.AIAssistant.Tip" xml:space="preserve">Use AI to generate commit message</x:String>
   <x:String x:Key="Text.AIAssistant.Use" xml:space="preserve">Use</x:String>
+  <x:String x:Key="Text.FilterableComboBox.FilterHint" xml:space="preserve">Type to filter…</x:String>
   <x:String x:Key="Text.App.Hide" xml:space="preserve">Hide SourceGit</x:String>
   <x:String x:Key="Text.App.HideOthers" xml:space="preserve">Hide Others</x:String>
   <x:String x:Key="Text.App.ShowAll" xml:space="preserve">Show All</x:String>
@@ -662,6 +663,8 @@
   <x:String x:Key="Text.Preferences.AI" xml:space="preserve">AI</x:String>
   <x:String x:Key="Text.Preferences.AI.AdditionalPrompt" xml:space="preserve">Additional Prompt (Use `-` to list your requirements)</x:String>
   <x:String x:Key="Text.Preferences.AI.ApiKey" xml:space="preserve">API Key</x:String>
+  <x:String x:Key="Text.Preferences.AI.DefaultService" xml:space="preserve">Default Platform</x:String>
+  <x:String x:Key="Text.Preferences.AI.DefaultService.Tip" xml:space="preserve">Use this platform by default when generating commit messages in all repositories. A repository-level setting overrides it. If not specified, the last picked platform is remembered for each repository.</x:String>
   <x:String x:Key="Text.Preferences.AI.ExtraHeaders" xml:space="preserve">Extra Headers (one `Name: Value` per line)</x:String>
   <x:String x:Key="Text.Preferences.AI.Model" xml:space="preserve">Model</x:String>
   <x:String x:Key="Text.Preferences.AI.Model.AutoFetchAvailableModels" xml:space="preserve">Fetch available model-ids automatically</x:String>

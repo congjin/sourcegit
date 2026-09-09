@@ -146,21 +146,38 @@ namespace SourceGit.Views
             base.OnOpened(e);
 
             if (DataContext is ViewModels.AIAssistant vm)
+            {
+                // Make sure a model is always picked (the last used one, or the first
+                // available) before the first generation starts.
+                if (string.IsNullOrEmpty(vm.CurrentModel) && vm.AvailableModels is { Count: > 0 })
+                    vm.CurrentModel = vm.AvailableModels[0];
+
                 await vm.GenAsync();
+            }
         }
 
         protected override void OnClosing(WindowClosingEventArgs e)
         {
+            // Popup teardown during window close can fire DropDownClosed -> a model commit;
+            // drop those so GenAsync is never restarted on a closing window.
+            _closing = true;
+
             base.OnClosing(e);
             (DataContext as ViewModels.AIAssistant)?.Cancel();
+            (DataContext as ViewModels.AIAssistant)?.Release();
+
+            // Persist the last used model so that it becomes the default on next launch.
+            ViewModels.Preferences.Instance.Save();
         }
 
-        private async void OnModelChanged(object sender, SelectionChangedEventArgs e)
+        private async void OnModelCommitted(object sender, EventArgs e)
         {
+            // Switching the model re-runs generation with the newly committed model.
+            if (_closing)
+                return;
+
             if (DataContext is ViewModels.AIAssistant vm && IsLoaded)
                 await vm.GenAsync();
-
-            e.Handled = true;
         }
 
         private void OnUseClicked(object sender, RoutedEventArgs e)
@@ -179,5 +196,7 @@ namespace SourceGit.Views
 
             e.Handled = true;
         }
+
+        private bool _closing = false;
     }
 }
