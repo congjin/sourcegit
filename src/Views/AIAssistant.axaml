@@ -4,16 +4,18 @@
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     xmlns:v="using:SourceGit.Views"
                     xmlns:vm="using:SourceGit.ViewModels"
-                    mc:Ignorable="d" d:DesignWidth="520" d:DesignHeight="400"
+                    xmlns:ai="using:SourceGit.AI"
+                    mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="520"
                     x:Class="SourceGit.Views.AIAssistant"
                     x:DataType="vm:AIAssistant"
                     x:Name="ThisControl"
                     Icon="/App.ico"
                     Title="{DynamicResource Text.AIAssistant}"
-                    Width="520" Height="400"
+                    Width="620" Height="520"
+                    MinWidth="480" MinHeight="360"
                     CanResize="True"
                     WindowStartupLocation="CenterOwner">
-  <Grid RowDefinitions="Auto,*,Auto">
+  <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto">
     <!-- TitleBar -->
     <Grid Grid.Row="0" Height="28" IsVisible="{Binding !#ThisControl.UseSystemWindowFrame}">
       <Border Background="{DynamicResource Brush.TitleBar}"
@@ -36,23 +38,37 @@
                         IsVisible="{OnPlatform True, macOS=False}"/>
     </Grid>
 
-    <!-- AI response -->
-    <v:AIResponseView Grid.Row="1"
-                      Margin="8"
-                      BorderThickness="1"
-                      BorderBrush="{DynamicResource Brush.Border2}"
-                      Background="{DynamicResource Brush.Contents}"
-                      Content="{Binding Text}"/>
-
-    <!-- Options -->
-    <Grid Grid.Row="2" Margin="8,0,8,8" ColumnDefinitions="Auto,*,18,Auto,Auto">
+    <!-- Platform &amp; model -->
+    <Grid Grid.Row="1" Margin="8,8,8,4" ColumnDefinitions="Auto,150,Auto,*,Auto">
       <TextBlock Grid.Column="0"
                  Classes="group_header_label"
+                 Margin="0,0,6,0"
+                 VerticalAlignment="Center"
+                 Text="{DynamicResource Text.AIAssistant.Service}"/>
+
+      <ComboBox Grid.Column="1"
+                Height="28"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                ItemsSource="{Binding Services, Mode=OneWay}"
+                SelectedItem="{Binding CurrentService, Mode=TwoWay}"
+                SelectionChanged="OnServiceChanged">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="{x:Type ai:Service}">
+            <TextBlock Text="{Binding Name}"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+
+      <TextBlock Grid.Column="2"
+                 Classes="group_header_label"
+                 Margin="12,0,6,0"
+                 VerticalAlignment="Center"
                  Text="{DynamicResource Text.AIAssistant.Model}"/>
 
-      <v:FilterableComboBox Grid.Column="1"
+      <v:FilterableComboBox Grid.Column="3"
                             Height="28"
-                            Margin="6,0" Padding="4,0"
+                            Padding="4,0"
                             BorderThickness="0"
                             Background="Transparent"
                             VerticalAlignment="Center"
@@ -61,25 +77,108 @@
                             SelectedModel="{Binding CurrentModel, Mode=TwoWay}"
                             SelectionCommitted="OnModelCommitted"/>
 
-      <v:LoadingIcon Grid.Column="2"
+      <v:LoadingIcon Grid.Column="4"
                      Width="14" Height="14"
+                     Margin="6,0,0,0"
                      IsVisible="{Binding IsGenerating}"/>
+    </Grid>
+
+    <!-- Error -->
+    <Border Grid.Row="2"
+            Margin="8,0,8,4"
+            Padding="8,6"
+            CornerRadius="4"
+            Background="{DynamicResource Brush.ErrorBG}"
+            BorderThickness="1" BorderBrush="{DynamicResource Brush.Error}"
+            IsVisible="{Binding HasError}">
+      <Grid ColumnDefinitions="Auto,*">
+        <Path Grid.Column="0" Width="12" Height="12" Margin="0,2,6,0"
+              VerticalAlignment="Top"
+              Data="{StaticResource Icons.Error}"
+              Fill="{DynamicResource Brush.Error}"/>
+        <TextBlock Grid.Column="1"
+                   Text="{Binding ErrorMessage}"
+                   TextWrapping="Wrap"
+                   Foreground="{DynamicResource Brush.FG1}"/>
+      </Grid>
+    </Border>
+
+    <!-- Editable commit message -->
+    <Border Grid.Row="3"
+            Margin="8,0,8,4"
+            BorderThickness="1"
+            BorderBrush="{DynamicResource Brush.Border2}"
+            Background="{DynamicResource Brush.Contents}">
+      <Grid>
+        <v:AIResponseView x:Name="ResultEditor"
+                          WordWrap="True"
+                          IsReadOnly="{Binding IsGenerating}"
+                          Content="{Binding Response, Mode=TwoWay}"/>
+
+        <TextBlock Margin="10,8"
+                   Text="{DynamicResource Text.AIAssistant.Placeholder}"
+                   TextWrapping="Wrap"
+                   Foreground="{DynamicResource Brush.FG2}"
+                   IsHitTestVisible="False"
+                   IsVisible="{Binding ShowPlaceholder}"/>
+      </Grid>
+    </Border>
+
+    <!-- Raw trace -->
+    <Expander Grid.Row="4"
+              Margin="8,0,8,0"
+              Padding="8,0,8,8"
+              IsExpanded="{Binding IsLogExpanded, Mode=TwoWay}">
+      <Expander.Header>
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Classes="group_header_label"
+                     VerticalAlignment="Center"
+                     Text="{DynamicResource Text.AIAssistant.Log}"/>
+          <v:LoadingIcon Width="12" Height="12" IsVisible="{Binding IsGenerating}"/>
+        </StackPanel>
+      </Expander.Header>
+
+      <v:AIResponseView Height="130"
+                        Margin="0,4,0,0"
+                        BorderThickness="1"
+                        BorderBrush="{DynamicResource Brush.Border2}"
+                        Background="{DynamicResource Brush.Contents}"
+                        Content="{Binding Log, Mode=OneWay}"/>
+    </Expander>
+
+    <!-- Actions -->
+    <Grid Grid.Row="5" Margin="8,6,8,8" ColumnDefinitions="*,Auto,Auto,Auto">
+      <Button Grid.Column="1"
+              Classes="flat"
+              Height="28"
+              Padding="12,0"
+              Content="{DynamicResource Text.AIAssistant.Copy}"
+              IsEnabled="{Binding HasResult}"
+              Click="OnCopyClicked"/>
+
+      <Button Grid.Column="2"
+              Classes="flat"
+              Height="28"
+              Margin="8,0" Padding="12,0"
+              Content="{DynamicResource Text.AIAssistant.Regen}"
+              IsVisible="{Binding !IsGenerating}"
+              Click="OnRegenClicked"/>
+
+      <Button Grid.Column="2"
+              Classes="flat"
+              Height="28"
+              Margin="8,0" Padding="12,0"
+              Content="{DynamicResource Text.AIAssistant.Stop}"
+              IsVisible="{Binding IsGenerating}"
+              Click="OnStopClicked"/>
 
       <Button Grid.Column="3"
               Classes="flat primary"
               Height="28"
-              Margin="8,0" Padding="12,0"
-              Content="{DynamicResource Text.AIAssistant.Use}"
-              IsEnabled="{Binding Response, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-              Click="OnUseClicked"/>
-
-      <Button Grid.Column="4"
-              Classes="flat"
-              Height="28"
               Padding="12,0"
-              Content="{DynamicResource Text.AIAssistant.Regen}"
-              IsEnabled="{Binding !IsGenerating}"
-              Click="OnRegenClicked"/>
+              Content="{DynamicResource Text.AIAssistant.Use}"
+              IsEnabled="{Binding HasResult}"
+              Click="OnUseClicked"/>
     </Grid>
   </Grid>
 </v:ChromelessWindow>

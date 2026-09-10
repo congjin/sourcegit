@@ -22,8 +22,14 @@
   <x:String x:Key="Text.AddWorktree.WhatToCheckout.CreateNew" xml:space="preserve">建立新分支</x:String>
   <x:String x:Key="Text.AddWorktree.WhatToCheckout.Existing" xml:space="preserve">已有分支</x:String>
   <x:String x:Key="Text.AIAssistant" xml:space="preserve">AI 助理</x:String>
+  <x:String x:Key="Text.AIAssistant.Copy" xml:space="preserve">複製</x:String>
+  <x:String x:Key="Text.AIAssistant.Log" xml:space="preserve">產生記錄</x:String>
   <x:String x:Key="Text.AIAssistant.Model" xml:space="preserve">模型</x:String>
+  <x:String x:Key="Text.AIAssistant.NoContent" xml:space="preserve">AI 沒有回傳提交訊息，請切換模型或平台後重試。</x:String>
+  <x:String x:Key="Text.AIAssistant.Placeholder" xml:space="preserve">AI 產生的提交訊息會顯示在這裡，可直接編輯後再套用。</x:String>
   <x:String x:Key="Text.AIAssistant.Regen" xml:space="preserve">重新產生</x:String>
+  <x:String x:Key="Text.AIAssistant.Service" xml:space="preserve">平台</x:String>
+  <x:String x:Key="Text.AIAssistant.Stop" xml:space="preserve">停止</x:String>
   <x:String x:Key="Text.AIAssistant.Tip" xml:space="preserve">使用 AI 產生提交訊息</x:String>
   <x:String x:Key="Text.AIAssistant.Use" xml:space="preserve">套用</x:String>
   <x:String x:Key="Text.FilterableComboBox.FilterHint" xml:space="preserve">輸入關鍵字篩選…</x:String>

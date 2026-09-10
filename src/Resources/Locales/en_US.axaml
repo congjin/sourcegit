@@ -18,8 +18,14 @@
   <x:String x:Key="Text.AddWorktree.WhatToCheckout.CreateNew" xml:space="preserve">Create New Branch</x:String>
   <x:String x:Key="Text.AddWorktree.WhatToCheckout.Existing" xml:space="preserve">Existing Branch</x:String>
   <x:String x:Key="Text.AIAssistant" xml:space="preserve">AI Assistant</x:String>
+  <x:String x:Key="Text.AIAssistant.Copy" xml:space="preserve">COPY</x:String>
+  <x:String x:Key="Text.AIAssistant.Log" xml:space="preserve">LOG</x:String>
   <x:String x:Key="Text.AIAssistant.Model" xml:space="preserve">MODEL</x:String>
+  <x:String x:Key="Text.AIAssistant.NoContent" xml:space="preserve">AI returned no commit message. Switch to another model or platform and try again.</x:String>
+  <x:String x:Key="Text.AIAssistant.Placeholder" xml:space="preserve">The generated commit message shows up here and can be edited before applying it.</x:String>
   <x:String x:Key="Text.AIAssistant.Regen" xml:space="preserve">RE-GENERATE</x:String>
+  <x:String x:Key="Text.AIAssistant.Service" xml:space="preserve">PLATFORM</x:String>
+  <x:String x:Key="Text.AIAssistant.Stop" xml:space="preserve">STOP</x:String>
   <x:String x:Key="Text.AIAssistant.Tip" xml:space="preserve">Use AI to generate commit message</x:String>
   <x:String x:Key="Text.AIAssistant.Use" xml:space="preserve">Use</x:String>
   <x:String x:Key="Text.FilterableComboBox.FilterHint" xml:space="preserve">Type to filter…</x:String>

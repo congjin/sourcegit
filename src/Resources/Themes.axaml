@@ -33,6 +33,8 @@
       <Color x:Key="Color.InlineCode">#FFE4E4E4</Color>
       <Color x:Key="Color.InlineCodeFG">Black</Color>
       <Color x:Key="Color.HistoryBG">#FFF0F5F9</Color>
+      <Color x:Key="Color.Error">#FFC62828</Color>
+      <Color x:Key="Color.ErrorBG">#18C62828</Color>
     </ResourceDictionary>
 
     <ResourceDictionary x:Key="Dark">
@@ -67,6 +69,8 @@
       <Color x:Key="Color.InlineCode">#FF383838</Color>
       <Color x:Key="Color.InlineCodeFG">#FFF0F0F0</Color>
       <Color x:Key="Color.HistoryBG">#FF272727</Color>
+      <Color x:Key="Color.Error">#FFEF5350</Color>
+      <Color x:Key="Color.ErrorBG">#28EF5350</Color>
     </ResourceDictionary>
   </ResourceDictionary.ThemeDictionaries>
 
@@ -103,4 +107,6 @@
   <SolidColorBrush x:Key="Brush.InlineCode" Color="{DynamicResource Color.InlineCode}"/>
   <SolidColorBrush x:Key="Brush.InlineCodeFG" Color="{DynamicResource Color.InlineCodeFG}"/>
   <SolidColorBrush x:Key="Brush.HistoryBG" Color="{DynamicResource Color.HistoryBG}"/>
+  <SolidColorBrush x:Key="Brush.Error" Color="{DynamicResource Color.Error}"/>
+  <SolidColorBrush x:Key="Brush.ErrorBG" Color="{DynamicResource Color.ErrorBG}"/>
 </ResourceDictionary>

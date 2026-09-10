@@ -76,6 +76,12 @@ namespace SourceGit.Views
             {
                 _fullItems = change.NewValue as IEnumerable;
                 ApplyFilter(_filterText);
+
+                // The list may be swapped asynchronously (e.g. another platform was picked
+                // and its models arrived late). Re-apply the current value so the box keeps
+                // showing it. Skipped while filtering, which would clobber the keyword.
+                if (!IsDropDownOpen)
+                    SyncDisplay(_selectedModel);
             }
         }
 
